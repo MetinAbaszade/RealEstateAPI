@@ -1,0 +1,48 @@
+include:
+  - project: 'devops/deployment'
+    ref: $BRANCH
+    file: 'backend/lint.yml'
+  - project: 'devops/deployment'
+    ref: $BRANCH
+    file: 'backend/build.yml'
+  - project: 'devops/deployment'
+    ref: $BRANCH
+    file: 'fortify.yml'
+  - project: 'devops/deployment'
+    ref: $BRANCH
+    file: 'backend/deploy.yml'
+
+lint:
+  extends: .lint
+  only:
+    - test
+
+fortify:
+  extends: .fortify
+  only:
+    - test
+  when: manual
+
+build_test:
+  extends: .build_test
+  only:
+    - test
+  needs: ['lint']
+
+deploy_test:
+  extends: .deploy_test
+  only:
+    - main
+  needs: ['build_test']
+
+#PROD
+build_prod:
+  extends: .build_prod
+  only:
+    - main
+
+deploy_prod:
+  extends: .deploy_prod
+  only:
+    - main
+  needs: ['build_prod']

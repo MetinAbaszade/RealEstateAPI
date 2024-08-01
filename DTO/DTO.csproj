@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Helper\**" />
+      <EmbeddedResource Remove="Helper\**" />
+      <None Remove="Helper\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="StyleCop.Analyzers" />
+        <None Remove="DTOs\CustomLoggingDTOs\" />
+        <None Remove="DTOs\RoleDTOs\" />
+        <None Remove="DTOs\OrganizationDTOs\" />
+        <None Remove="DTOs\AuthDTOs\AuthValidators\" />
+        <None Remove="FluentValidation.AspNetCore" />
+        <None Remove="DTOs\OrganizationDTOs\OrganizationValidators\" />
+        <None Remove="DTOs\RoleDTOs\RoleValidators\" />
+        <None Remove="DTOs\UserDTOs\UserValidators\" />
+        <None Remove="Permission\" />
+        <None Remove="Token\" />
+        <None Remove="CustomLogging\Validators\" />
+        <None Remove="Permission\Validators\" />
+        <None Remove="Responses\Validators\" />
+        <None Remove="Token\Validators\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="First\FirstDtos.cs" />
+    </ItemGroup>
+</Project>

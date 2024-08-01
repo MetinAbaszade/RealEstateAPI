@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="Entities\First.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CORE\CORE.csproj" />
+    </ItemGroup>
+</Project>
