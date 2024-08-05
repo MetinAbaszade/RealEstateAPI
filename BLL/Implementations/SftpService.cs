@@ -8,7 +8,7 @@ using System.Drawing.Imaging;
 using System.Runtime.Versioning;
 using ConnectionInfo = Renci.SshNet.ConnectionInfo;
 
-namespace CORE.Concrete;
+namespace BLL.Implementations;
 
 public class SftpService(ConfigSettings configSettings) : ISftpService
 {

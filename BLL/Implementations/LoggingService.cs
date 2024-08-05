@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using BLL.Abstract;
+using CORE.Abstract;
 using DAL.EntityFramework.Abstract;
 using DTO.Logging;
 using ENTITIES.Entities;
 
-namespace BLL.Concrete;
+namespace BLL.Implementations;
 
 public class LoggingService(IMapper mapper,
                             IRequestLogRepository requestLogRepository) : ILoggingService

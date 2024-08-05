@@ -6,10 +6,8 @@ namespace DAL.EntityFramework.Abstract;
 
 public interface IUserRepository : IGenericRepository<User>
 {
-    Task<bool> IsUserExistAsync(string email, Guid? userId);
-
-    Task<string?> GetUserSaltAsync(string email);
-
+    Task<bool> IsUserExistbyContactNumberAsync(string contactNumber, Guid? userId);
+    Task<string?> GetUserSaltAsync(string contactNumber);
     Task UpdateUserAsync(User user);
     Task<User> GetAsync(Expression<Func<User, bool>> filter);
     IQueryable<User> GetList(Expression<Func<User, bool>>? filter = null);

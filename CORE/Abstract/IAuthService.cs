@@ -2,11 +2,11 @@
 using DTO.Responses;
 using DTO.User;
 
-namespace BLL.Abstract;
+namespace CORE.Abstract;
 
 public interface IAuthService
 {
-    Task<string?> GetUserSaltAsync(string email);
+    Task<string?> GetUserSaltAsync(string contactNumber);
 
     Task<IDataResult<UserResponseDto>> LoginAsync(LoginRequestDto dto);
 

@@ -2,29 +2,16 @@
 using DAL.EntityFramework.Seeds;
 using ENTITIES.Entities;
 using ENTITIES.Entities.Generic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.EntityFramework.Context;
 
-public class DataContext : DbContext
+public class DataContext(DbContextOptions<DataContext> options,
+                         ITokenService tokenService) : DbContext(options)
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUtilService _utilService;
-
-    public DataContext(DbContextOptions<DataContext> options,
-                       IHttpContextAccessor httpContextAccessor,
-                       IUtilService utilService) : base(options)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _utilService = utilService;
-    }
-
     public required DbSet<User> Users { get; set; }
-    public required DbSet<Role> Roles { get; set; }
     public required DbSet<RequestLog> RequestLogs { get; set; }
     public required DbSet<ResponseLog> ResponseLogs { get; set; }
-    public required DbSet<Permission> Permissions { get; set; }
     public required DbSet<Token> Tokens { get; set; }
     public required DbSet<ErrorLog> ErrorLogs { get; set; }
 
@@ -67,7 +54,7 @@ public class DataContext : DbContext
                 case EntityState.Added:
                     ((Auditable)entityEntry.Entity).CreatedAt = DateTime.Now;
                     ((Auditable)entityEntry.Entity).CreatedById =
-                        _utilService.GetUserIdFromToken();
+                        tokenService.GetUserIdFromToken();
                     break;
                 case EntityState.Modified:
                     {
@@ -85,13 +72,13 @@ public class DataContext : DbContext
 
                             ((Auditable)entityEntry.Entity).DeletedAt = DateTime.Now;
                             ((Auditable)entityEntry.Entity).DeletedBy =
-                                _utilService.GetUserIdFromToken();
+                                tokenService.GetUserIdFromToken();
                         }
                         else
                         {
                             ((Auditable)entityEntry.Entity).ModifiedAt = DateTime.Now;
                             ((Auditable)entityEntry.Entity).ModifiedBy =
-                                _utilService.GetUserIdFromToken();
+                                tokenService.GetUserIdFromToken();
                         }
 
                         break;

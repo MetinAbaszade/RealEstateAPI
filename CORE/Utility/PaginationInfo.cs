@@ -1,4 +1,4 @@
-﻿namespace DAL.EntityFramework.Utility;
+﻿namespace CORE.Utility;
 
 public class PaginationInfo
 {

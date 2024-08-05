@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using BLL.Abstract;
-using BLL.Helpers;
 using CORE.Abstract;
 using CORE.Localization;
 using DAL.EntityFramework.Abstract;
@@ -8,27 +6,27 @@ using DTO.Auth;
 using DTO.Responses;
 using DTO.User;
 
-namespace BLL.Concrete;
+namespace BLL.Implementations;
 
 public class AuthService(IMapper mapper,
                          IUserRepository userRepository,
                          ITokenRepository tokenRepository,
-                         IUtilService utilService) : IAuthService
+                         ITokenService tokenService) : IAuthService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenRepository _tokenRepository = tokenRepository;
-    private readonly IUtilService _utilService = utilService;
+    private readonly ITokenService _tokenService = tokenService;
 
-    public async Task<string?> GetUserSaltAsync(string email)
+    public async Task<string?> GetUserSaltAsync(string contactNumber)
     {
-        return await _userRepository.GetUserSaltAsync(email);
+        return await _userRepository.GetUserSaltAsync(contactNumber);
     }
 
     public async Task<IDataResult<UserResponseDto>> LoginAsync(LoginRequestDto dto)
     {
-        var data = await _userRepository.GetAsync(m => m.Email == dto.Email &&
-                                                       m.Password == dto.Password);
+        var data = await _userRepository.GetAsync(m => m.ContactNumber == dto.ContactNumber &&
+                                                          m.Password == dto.Password);
 
         if (data == null)
         {
@@ -40,7 +38,7 @@ public class AuthService(IMapper mapper,
 
     public async Task<IDataResult<UserResponseDto>> LoginByTokenAsync()
     {
-        var userId = _utilService.GetUserIdFromToken();
+        var userId = _tokenService.GetUserIdFromToken();
 
         var data = await _userRepository.GetAsync(m => m.Id == userId);
         if (data == null)

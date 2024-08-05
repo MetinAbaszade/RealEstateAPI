@@ -1,17 +1,21 @@
-﻿using DAL.EntityFramework.Utility;
+﻿using CORE.Utility;
 using DTO.Auth;
 using DTO.Responses;
 using DTO.User;
+using ENTITIES.Entities;
+using System.Linq.Expressions;
 
-namespace BLL.Abstract;
+namespace CORE.Abstract;
 
 public interface IUserService
 {
     Task<IDataResult<PaginatedList<UserResponseDto>>> GetAsPaginatedListAsync(int pageIndex, int pageSize);
 
-    Task<IDataResult<IEnumerable<UserResponseDto>>> GetAsync();
+    Task<IDataResult<IEnumerable<UserResponseDto>>> GetListAsync();
 
     Task<IDataResult<UserByIdResponseDto>> GetAsync(Guid id);
+
+    Task<IDataResult<User>?> GetAsync(Expression<Func<User, bool>> filter);
 
     Task<IResult> AddAsync(UserCreateRequestDto dto);
 

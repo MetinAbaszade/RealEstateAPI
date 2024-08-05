@@ -1,13 +1,13 @@
 using AutoMapper;
-using BLL.Abstract;
+using CORE.Abstract;
 using CORE.Localization;
+using CORE.Utility;
 using DAL.EntityFramework.Abstract;
-using DAL.EntityFramework.Utility;
 using DTO.ErrorLog;
 using DTO.Responses;
 using ENTITIES.Entities;
 
-namespace BLL.Concrete;
+namespace BLL.Implementations;
 
 public class ErrorLogService(IMapper mapper,
                              IErrorLogRepository errorLogRepository) : IErrorLogService

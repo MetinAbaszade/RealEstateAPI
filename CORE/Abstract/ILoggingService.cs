@@ -1,6 +1,6 @@
 ﻿using DTO.Logging;
 
-namespace BLL.Abstract;
+namespace CORE.Abstract;
 
 public interface ILoggingService
 {

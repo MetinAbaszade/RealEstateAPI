@@ -20,32 +20,32 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
     public async Task<User> GetAsync(Expression<Func<User, bool>> filter)
     {
-        return (await _dataContext.Users.Include(m => m.Role).FirstOrDefaultAsync(filter))!;
+        return (await _dataContext.Users.FirstOrDefaultAsync(filter))!;
     }
 
     public IQueryable<User> GetList(Expression<Func<User, bool>>? filter = null)
     {
         return filter is null ?
-              _dataContext.Users.Include(m => m.Role) :
-              _dataContext.Users.Include(m => m.Role).Where(filter);
+              _dataContext.Users :
+              _dataContext.Users.Where(filter);
     }
 
     public async Task<IEnumerable<User>> GetListAsync(Expression<Func<User, bool>>? filter = null)
     {
         return filter is null ?
-              await _dataContext.Users.Include(m => m.Role).ToListAsync() :
-              await _dataContext.Users.Include(m => m.Role).Where(filter).ToListAsync();
+              await _dataContext.Users.ToListAsync() :
+              await _dataContext.Users.Where(filter).ToListAsync();
     }
 
-    public async Task<string?> GetUserSaltAsync(string email)
+    public async Task<string?> GetUserSaltAsync(string contactNumber)
     {
-        var user = await _dataContext.Users.SingleOrDefaultAsync(m => m.Email == email);
+        var user = await _dataContext.Users.SingleOrDefaultAsync(m => m.ContactNumber == contactNumber);
         return user?.Salt;
     }
 
-    public async Task<bool> IsUserExistAsync(string email, Guid? userId)
+    public async Task<bool> IsUserExistbyContactNumberAsync(string contactNumber, Guid? userId)
     {
-        return await _dataContext.Users.AnyAsync(m => m.Email == email && m.Id != userId);
+        return await _dataContext.Users.AnyAsync(m => m.ContactNumber == contactNumber && m.Id != userId);
     }
 
     public Task UpdateUserAsync(User user)

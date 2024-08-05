@@ -1,12 +1,13 @@
 ﻿using API.Attributes;
 using API.Filters;
-using BLL.Abstract;
 using BLL.Helpers;
 using CORE.Abstract;
 using CORE.Config;
 using CORE.Localization;
 using DTO.Auth;
 using DTO.Responses;
+using DTO.User;
+using ENTITIES.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,29 +20,19 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 [ServiceFilter(typeof(LogActionFilter))]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class AuthController : Controller
+public class AuthController(IAuthService authService,
+                            ConfigSettings configSettings,
+                            IUserService userService,
+                            ITokenService tokenService,
+                            IOtpService otpService) : Controller
 {
-    private readonly IAuthService _authService;
-    private readonly ConfigSettings _configSettings;
-    private readonly ITokenService _tokenService;
-    private readonly IUtilService _utilService;
-
-    public AuthController(IAuthService authService, ConfigSettings configSettings,
-                          IUtilService utilService, ITokenService tokenService)
-    {
-        _authService = authService;
-        _configSettings = configSettings;
-        _tokenService = tokenService;
-        _utilService = utilService;
-    }
-
     [SwaggerOperation(Summary = "login")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<LoginResponseDto>))]
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
     {
-        var userSalt = await _authService.GetUserSaltAsync(dto.Email);
+        var userSalt = await authService.GetUserSaltAsync(dto.ContactNumber);
 
         if (string.IsNullOrEmpty(userSalt))
         {
@@ -50,15 +41,63 @@ public class AuthController : Controller
 
         dto = dto with { Password = SecurityHelper.HashPassword(dto.Password, userSalt) };
 
-        var loginResult = await _authService.LoginAsync(dto);
+        var loginResult = await authService.LoginAsync(dto);
         if (!loginResult.Success)
         {
-            return Ok(loginResult);
+            return Unauthorized(loginResult);
         }
 
-        var response = await _tokenService.CreateTokenAsync(loginResult.Data!);
+        var response = await tokenService.CreateTokenAsync(loginResult.Data!);
 
         return Ok(response);
+    }
+
+    [SwaggerOperation(Summary = "register")]
+    [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Register([FromBody] UserCreateRequestDto dto)
+    {
+        var registerResult = await userService.AddAsync(dto);
+        if (!registerResult.Success)
+        {
+            return BadRequest(registerResult);
+        }
+
+        var otp = otpService.GenerateOtp();
+        otpService.SaveOtpinCache(dto.ContactNumber, otp);
+        await otpService.SendOtpAsync(dto.ContactNumber, otp);
+
+        return Ok(registerResult);
+    }
+
+    [SwaggerOperation(Summary = "validat eotp")]
+    [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
+    [HttpPost("validateotp")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ValidateOtp([FromBody] ValidateOtpRequestDto dto)
+    {
+        var isValid = otpService.ValidateOtp(dto);
+        if (!isValid)
+        {
+            return BadRequest(new ErrorResult(EMessages.InvalidVerificationCode.Translate()));
+        }
+
+        var getUserResult = await userService.GetAsync(u => u.ContactNumber == dto.ContactNumber);
+
+        if (getUserResult is SuccessDataResult<User> resultData)
+        {
+            var updateUserRequestDto = new UserUpdateRequestDto()
+            {
+                ContactNumber = getUserResult.Data.ContactNumber,
+                Username = getUserResult.Data.Username,
+                Verified = true
+            };
+            var updateUserResult = await userService.UpdateAsync(getUserResult.Data.Id, updateUserRequestDto);
+            return Ok(updateUserResult);
+        }
+
+        return BadRequest(new ErrorResult(EMessages.UserIsNotExist.Translate()));
     }
 
     [SwaggerOperation(Summary = "refesh access token")]
@@ -67,15 +106,15 @@ public class AuthController : Controller
     [HttpGet("refresh/token")]
     public async Task<IActionResult> RefreshToken()
     {
-        var jwtToken = _utilService.TrimToken(HttpContext.Request.Headers[_configSettings.AuthSettings.HeaderName]!);
+        var jwtToken = tokenService.TrimToken(HttpContext.Request.Headers[configSettings.AuthSettings.HeaderName]!);
 
-        string refreshToken = HttpContext.Request.Headers[_configSettings.AuthSettings.RefreshTokenHeaderName]!;
+        string refreshToken = HttpContext.Request.Headers[configSettings.AuthSettings.RefreshTokenHeaderName]!;
 
-        var tokenResponse = await _tokenService.GetAsync(jwtToken, refreshToken);
+        var tokenResponse = await tokenService.GetAsync(jwtToken, refreshToken);
         if (tokenResponse.Success)
         {
-            await _tokenService.SoftDeleteAsync(tokenResponse.Data!.Id);
-            var response = await _tokenService.CreateTokenAsync(tokenResponse.Data.User);
+            await tokenService.SoftDeleteAsync(tokenResponse.Data!.Id);
+            var response = await tokenService.CreateTokenAsync(tokenResponse.Data.User);
             return Ok(response);
         }
 
@@ -93,7 +132,7 @@ public class AuthController : Controller
             return Unauthorized(new ErrorResult(EMessages.CanNotFoundUserIdInYourAccessToken.Translate()));
         }
 
-        var loginByTokenResponse = await _authService.LoginByTokenAsync();
+        var loginByTokenResponse = await authService.LoginByTokenAsync();
         if (!loginByTokenResponse.Success)
         {
             return BadRequest(loginByTokenResponse.Data);
@@ -102,7 +141,7 @@ public class AuthController : Controller
         LoginInfoByTokenResponseDto loginInfoByTokenResponseDto = new()
         {
             User = loginByTokenResponse.Data!,
-            AccessToken = _utilService.TrimToken(_utilService.GetTokenString())!
+            AccessToken = tokenService.TrimToken(tokenService.GetTokenString())!
         };
 
         return Ok(new SuccessDataResult<LoginInfoByTokenResponseDto>(loginInfoByTokenResponseDto, EMessages.Success.Translate()));
@@ -114,8 +153,8 @@ public class AuthController : Controller
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        var accessToken = _utilService.TrimToken(_utilService.GetTokenString()!);
-        var response = await _authService.LogoutAsync(accessToken);
+        var accessToken = tokenService.TrimToken(tokenService.GetTokenString()!);
+        var response = await authService.LogoutAsync(accessToken);
 
         return Ok(response);
     }

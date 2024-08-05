@@ -40,6 +40,8 @@ builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(config.C
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddMemoryCache();
+
 // configure max request body size as 60 MB
 builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = 60 * 1024 * 1024);
 

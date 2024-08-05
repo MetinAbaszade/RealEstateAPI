@@ -11,7 +11,4 @@
         <Compile Remove="Entities\First.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\CORE\CORE.csproj" />
-    </ItemGroup>
 </Project>

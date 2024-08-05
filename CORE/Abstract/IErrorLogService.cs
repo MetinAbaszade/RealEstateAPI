@@ -1,8 +1,8 @@
-using DAL.EntityFramework.Utility;
+using CORE.Utility;
 using DTO.ErrorLog;
 using DTO.Responses;
 
-namespace BLL.Abstract;
+namespace CORE.Abstract;
 
 public interface IErrorLogService
 {

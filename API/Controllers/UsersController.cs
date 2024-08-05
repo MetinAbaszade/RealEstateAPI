@@ -1,7 +1,5 @@
 ﻿using API.Attributes;
 using API.Filters;
-using BLL.Abstract;
-using BLL.Concrete;
 using CORE.Abstract;
 using CORE.Constants;
 using CORE.Enums;
@@ -21,27 +19,18 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ValidateToken]
-public class UsersController : Controller
+public class UsersController(IUserService userService,
+                             IUtilService utilService,
+                             ITokenService tokenService,
+                             IAuthService authService) : Controller
 {
-    private readonly IUserService _userService;
-    private readonly IUtilService _utilService;
-    private readonly IAuthService _authService;
-    public UsersController(IUserService userService,
-                           IUtilService utilService,
-                           IAuthService authService)
-    {
-        _userService = userService;
-        _utilService = utilService;
-        _authService = authService;
-    }
-
     [SwaggerOperation(Summary = "get users as paginated list")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<UserResponseDto>>))]
     [ServiceFilter(typeof(LogActionFilter))]
     [HttpGet("{pageIndex}/{pageSize}")]
     public async Task<IActionResult> GetAsPaginated([FromRoute] int pageIndex, int pageSize)
     {
-        var response = await _userService.GetAsPaginatedListAsync(pageIndex, pageSize);
+        var response = await userService.GetAsPaginatedListAsync(pageIndex, pageSize);
         return Ok(response);
     }
 
@@ -49,9 +38,9 @@ public class UsersController : Controller
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<UserResponseDto>>))]
     [ServiceFilter(typeof(LogActionFilter))]
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetUsers()
     {
-        var response = await _userService.GetAsync();
+        var response = await userService.GetListAsync();
         return Ok(response);
     }
 
@@ -61,8 +50,8 @@ public class UsersController : Controller
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfileInfo()
     {
-        var userId = _utilService.GetUserIdFromToken();
-        var response = await _userService.GetAsync(userId);
+        Guid userId = tokenService.GetUserIdFromToken();
+        IDataResult<UserByIdResponseDto> response = await userService.GetAsync(userId);
         return Ok(response);
     }
 
@@ -72,7 +61,7 @@ public class UsersController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        var response = await _userService.GetAsync(id);
+        var response = await userService.GetAsync(id);
         return Ok(response);
     }
 
@@ -82,7 +71,7 @@ public class UsersController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Add([FromBody] UserCreateRequestDto dto)
     {
-        var response = await _userService.AddAsync(dto);
+        var response = await userService.AddAsync(dto);
         return Ok(response);
     }
 
@@ -92,7 +81,7 @@ public class UsersController : Controller
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateRequestDto dto)
     {
-        var response = await _userService.UpdateAsync(id, dto);
+        var response = await userService.UpdateAsync(id, dto);
         return Ok(response);
     }
 
@@ -102,8 +91,8 @@ public class UsersController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        var response = await _userService.SoftDeleteAsync(id);
-        await _authService.LogoutRemovedUserAsync(id);
+        var response = await userService.SoftDeleteAsync(id);
+        await authService.LogoutRemovedUserAsync(id);
         return Ok(response);
     }
 
@@ -112,7 +101,7 @@ public class UsersController : Controller
     [HttpPost("upload/image")]
     public async Task<IActionResult> UploadImage(IFormFile file)
     {
-        Guid userId = _utilService.GetUserIdFromToken();
+        Guid userId = tokenService.GetUserIdFromToken();
         return await UploadImage(userId, file);
     }
 
@@ -129,10 +118,10 @@ public class UsersController : Controller
             return BadRequest(new ErrorDataResult<string>(EMessages.ThisFileTypeIsNotAllowed.Translate()));
         }
 
-        var path = _utilService.GetEnvFolderPath(_utilService.GetFolderName(EFileType.UserImages));
+        var path = utilService.GetEnvFolderPath(utilService.GetFolderName(EFileType.UserImages));
         await FileHelper.WriteFile(file, $"{fileNewName}{fileExtension}", path);
 
-        await _userService.SetImageAsync(id, $"{fileNewName}{fileExtension}");
+        await userService.SetImageAsync(id, $"{fileNewName}{fileExtension}");
 
         return Ok(new SuccessResult(EMessages.Success.Translate()));
     }
@@ -143,7 +132,7 @@ public class UsersController : Controller
     [HttpDelete("image")]
     public async Task<IActionResult> DeleteImage()
     {
-        Guid userId = _utilService.GetUserIdFromToken();
+        Guid userId = tokenService.GetUserIdFromToken();
         var response = await DeleteImage(userId);
         return response;
     }
@@ -154,7 +143,7 @@ public class UsersController : Controller
     [HttpDelete("{id}/image")]
     public async Task<IActionResult> DeleteImage([FromRoute] Guid id)
     {
-        var existFile = await _userService.GetImageAsync(id);
+        var existFile = await userService.GetImageAsync(id);
 
         if (existFile is null || !existFile.Success)
         {
@@ -166,7 +155,7 @@ public class UsersController : Controller
             return Ok(new SuccessResult(EMessages.Success.Translate()));
         }
 
-        var path = _utilService.GetEnvFolderPath(_utilService.GetFolderName(EFileType.UserImages));
+        var path = utilService.GetEnvFolderPath(utilService.GetFolderName(EFileType.UserImages));
         var fullPath = System.IO.Path.Combine(path, existFile!.Data);
 
         if (System.IO.File.Exists(fullPath))
@@ -174,7 +163,7 @@ public class UsersController : Controller
             System.IO.File.Delete(fullPath);
         }
 
-        await _userService.SetImageAsync(id);
+        await userService.SetImageAsync(id);
 
         return Ok(new SuccessResult(EMessages.Success.Translate()));
     }
@@ -185,9 +174,9 @@ public class UsersController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
     {
-        var userId = _utilService.GetUserIdFromToken();
-        var response = await _userService.ResetPasswordAsync(userId, request);
-        await _authService.LogoutRemovedUserAsync(userId);
+        var userId = tokenService.GetUserIdFromToken();
+        var response = await userService.ResetPasswordAsync(userId, request);
+        await authService.LogoutRemovedUserAsync(userId);
 
         return Ok(response);
     }
@@ -198,8 +187,8 @@ public class UsersController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromRoute] Guid id, [FromBody] ResetPasswordRequestDto request)
     {
-        var response = await _userService.ResetPasswordAsync(id, request);
-        await _authService.LogoutRemovedUserAsync(id);
+        var response = await userService.ResetPasswordAsync(id, request);
+        await authService.LogoutRemovedUserAsync(id);
 
         return Ok(response);
     }

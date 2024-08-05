@@ -1,5 +1,4 @@
-﻿using BLL.Abstract;
-using CORE.Abstract;
+﻿using CORE.Abstract;
 using CORE.Config;
 using DTO.Logging;
 using Microsoft.AspNetCore.Http.Features;
@@ -11,15 +10,13 @@ public class LogActionFilter : IAsyncActionFilter
 {
     private readonly ConfigSettings _configSettings;
     private readonly ILoggingService _loggingService;
-    private readonly IUtilService _utilService;
+    private readonly ITokenService _tokenService;
 
-    public LogActionFilter(IUtilService utilService,
-                           ILoggingService loggingService,
-                           ConfigSettings configSettings)
+    public LogActionFilter(ConfigSettings configSettings, ILoggingService loggingService, ITokenService tokenService)
     {
-        _utilService = utilService;
-        _loggingService = loggingService;
         _configSettings = configSettings;
+        _loggingService = loggingService;
+        _tokenService = tokenService;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -37,7 +34,7 @@ public class LogActionFilter : IAsyncActionFilter
         if (!string.IsNullOrEmpty(httpContext.Request.Headers[authHeaderName]) && httpContext.Request.Headers[authHeaderName].ToString().Length > 7)
         {
             token = httpContext.Request.Headers[authHeaderName].ToString();
-            userId = !string.IsNullOrEmpty(token) ? _utilService.GetUserIdFromToken() : null;
+            userId = !string.IsNullOrEmpty(token) ? _tokenService.GetUserIdFromToken() : null;
         }
 
         context.HttpContext.Request.Body.Position = 0;

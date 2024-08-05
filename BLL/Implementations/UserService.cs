@@ -1,40 +1,34 @@
 ﻿using AutoMapper;
-using BLL.Abstract;
 using BLL.Helpers;
-using CORE.Enums;
+using CORE.Abstract;
 using CORE.Localization;
+using CORE.Utility;
 using DAL.EntityFramework.Abstract;
-using DAL.EntityFramework.Utility;
 using DTO.Auth;
 using DTO.Responses;
 using DTO.User;
 using ENTITIES.Entities;
+using System.Linq.Expressions;
 
-namespace BLL.Concrete;
+namespace BLL.Implementations;
 
 public class UserService(IMapper mapper,
                          IUserRepository userRepository,
-                         IRoleRepository roleRepository,
                          ITokenRepository tokenRepository) : IUserService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUserRepository _userRepository = userRepository;
-    private readonly IRoleRepository _roleRepository = roleRepository;
     private readonly ITokenRepository _tokenRepository = tokenRepository;
 
     public async Task<IResult> AddAsync(UserCreateRequestDto dto)
     {
-        if (await _userRepository.IsUserExistAsync(dto.Email, null))
+
+        var userExists = await _userRepository.IsUserExistbyContactNumberAsync(dto.ContactNumber, null);
+        if (userExists)
         {
             return new ErrorResult(EMessages.UserIsExist.Translate());
         }
 
-        dto = dto with
-        {
-            RoleId = !dto.RoleId.HasValue
-                     ? (await _roleRepository.GetAsync(EUserType.Guest)).Id
-                     : dto.RoleId
-        };
         var data = _mapper.Map<User>(dto);
 
         data.Salt = SecurityHelper.GenerateSalt();
@@ -67,7 +61,7 @@ public class UserService(IMapper mapper,
         return new SuccessResult();
     }
 
-    public async Task<IDataResult<IEnumerable<UserResponseDto>>> GetAsync()
+    public async Task<IDataResult<IEnumerable<UserResponseDto>>> GetListAsync()
     {
         var datas = await _userRepository.GetListAsync();
         return new SuccessDataResult<IEnumerable<UserResponseDto>>(_mapper.Map<IEnumerable<UserResponseDto>>(datas), EMessages.Success.Translate());
@@ -79,19 +73,22 @@ public class UserService(IMapper mapper,
         return new SuccessDataResult<UserByIdResponseDto>(data, EMessages.Success.Translate());
     }
 
+    public async Task<IDataResult<User>> GetAsync(Expression<Func<User, bool>> filter)
+    {
+        var user = await _userRepository.GetAsync(filter);
+        if (user is null)
+        {
+            return new ErrorDataResult<User>(EMessages.UserIsNotExist.Translate());
+        }
+        return new SuccessDataResult<User>(user, EMessages.Success.Translate());
+    }
+
     public async Task<IResult> UpdateAsync(Guid id, UserUpdateRequestDto dto)
     {
-        if (await _userRepository.IsUserExistAsync(dto.Email, id))
+        if (await _userRepository.IsUserExistbyContactNumberAsync(dto.ContactNumber, id))
         {
             return new ErrorResult(EMessages.UserIsExist.Translate());
         }
-
-        dto = dto with
-        {
-            RoleId = dto.RoleId is null
-                     ? (await _roleRepository.GetAsync(EUserType.Guest)).Id
-                     : dto.RoleId
-        };
 
         var data = _mapper.Map<User>(dto);
         data.Id = id;

@@ -1,6 +1,6 @@
 ﻿using BLL;
+using BLL.Implementations;
 using CORE.Abstract;
-using CORE.Concrete;
 using CORE.Config;
 using DAL.EntityFramework;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Refit;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
 using System.Text;

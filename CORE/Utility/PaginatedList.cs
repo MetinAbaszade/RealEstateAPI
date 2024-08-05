@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace DAL.EntityFramework.Utility;
+namespace CORE.Utility;
 
 public class PaginatedList<T> : PaginationInfo
 {
