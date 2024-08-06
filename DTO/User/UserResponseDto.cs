@@ -1,5 +1,4 @@
-﻿using DTO.Role;
-
+﻿
 namespace DTO.User;
 
 public record UserResponseDto()

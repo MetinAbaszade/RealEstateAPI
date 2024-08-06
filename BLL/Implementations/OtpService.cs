@@ -1,16 +1,19 @@
 ﻿using CORE.Abstract;
+using CORE.Localization;
 using DTO.Auth;
+using DTO.Responses;
 using Microsoft.Extensions.Caching.Memory;
 using static System.Net.WebRequestMethods;
 
 namespace BLL.Implementations;
 internal class OtpService(IMemoryCache memoryCache) : IOtpService
 {
-    public async Task SendOtpAsync(string contactNumber, string otp)
+    public async Task<IResult> SendOtpAsync(string contactNumber, string otp)
     {
         // Here Will be real otp implementation of sending otp
         Console.WriteLine(otp);
         await Task.Delay(2000);
+        return new SuccessResult(EMessages.VerificationCodeSent.Translate());
     }
 
     public string GenerateOtp()
@@ -28,11 +31,11 @@ internal class OtpService(IMemoryCache memoryCache) : IOtpService
         memoryCache.Set(contactNumber, otp, cacheEntryOptions);
     }
 
-    public bool ValidateOtp(ValidateOtpRequestDto dto)
+    public bool ValidateOtp(string contactNumber, string otp)
     {
-        if (memoryCache.TryGetValue(dto.ContactNumber, out string cachedOtp))
+        if (memoryCache.TryGetValue(contactNumber, out string cachedOtp))
         {
-            return cachedOtp == dto.Otp;
+            return cachedOtp == otp;
         }
 
         return false;

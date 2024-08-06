@@ -11,7 +11,9 @@ using DTO.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using Constants = CORE.Constants.Constants;
 using IResult = DTO.Responses.IResult;
 
 namespace API.Controllers;
@@ -22,7 +24,8 @@ namespace API.Controllers;
 public class UsersController(IUserService userService,
                              IUtilService utilService,
                              ITokenService tokenService,
-                             IAuthService authService) : Controller
+                             IAuthService authService,
+                             IOtpService otpService) : Controller
 {
     [SwaggerOperation(Summary = "get users as paginated list")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<UserResponseDto>>))]
@@ -168,28 +171,24 @@ public class UsersController(IUserService userService,
         return Ok(new SuccessResult(EMessages.Success.Translate()));
     }
 
-    [SwaggerOperation(Summary = "reset logged in user password")]
-    [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
-    [HttpPost("resetPassword")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
-    {
-        var userId = tokenService.GetUserIdFromToken();
-        var response = await userService.ResetPasswordAsync(userId, request);
-        await authService.LogoutRemovedUserAsync(userId);
-
-        return Ok(response);
-    }
-
     [SwaggerOperation(Summary = "reset user password by id")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
     [HttpPost("{id}/resetPassword")]
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromRoute] Guid id, [FromBody] ResetPasswordRequestDto request)
     {
-        var response = await userService.ResetPasswordAsync(id, request);
-        await authService.LogoutRemovedUserAsync(id);
+        var isOtpValid = otpService.ValidateOtp(request.ContactNumber, request.Otp);
+        if (!isOtpValid)
+        {
+            return BadRequest(EMessages.InvalidVerificationCode.Translate());
+        }
+        var response = await userService.ResetPasswordAsync(id, request.Password);
+        if (!response.Success)
+        {
+            return BadRequest(response);
+        }
 
+        await authService.LogoutRemovedUserAsync(id);
         return Ok(response);
     }
 }

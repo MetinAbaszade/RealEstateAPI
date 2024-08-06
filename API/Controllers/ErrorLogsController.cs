@@ -1,6 +1,6 @@
 using API.Attributes;
 using API.Filters;
-using BLL.Abstract;
+using CORE.Abstract;
 using DTO.ErrorLog;
 using DTO.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

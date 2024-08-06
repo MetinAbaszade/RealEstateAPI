@@ -6,8 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DTO.Auth;
-public record SendVerificationCodeRequestDto
+public record SendOtpRequestDto
 {
-    [EmailAddress]
-    public string Email { get; set; } = default!;
+    public required string ContactNumber { get; set; } = default!;
 }

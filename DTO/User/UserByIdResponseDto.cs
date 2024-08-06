@@ -1,5 +1,4 @@
-﻿using DTO.Role;
-
+﻿
 namespace DTO.User;
 
 public record UserByIdResponseDto()
@@ -8,6 +7,5 @@ public record UserByIdResponseDto()
     public required string Username { get; set; }
     public required string Email { get; set; }
     public required string ContactNumber { get; set; }
-    public RoleToFkDto? Role { get; set; }
     public string? Image { get; set; }
 }

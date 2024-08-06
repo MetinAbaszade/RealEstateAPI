@@ -77,27 +77,20 @@ public class AuthController(IAuthService authService,
     [AllowAnonymous]
     public async Task<IActionResult> ValidateOtp([FromBody] ValidateOtpRequestDto dto)
     {
-        var isValid = otpService.ValidateOtp(dto);
+        var isValid = otpService.ValidateOtp(dto.ContactNumber, dto.Otp);
         if (!isValid)
         {
             return BadRequest(new ErrorResult(EMessages.InvalidVerificationCode.Translate()));
         }
 
-        var getUserResult = await userService.GetAsync(u => u.ContactNumber == dto.ContactNumber);
+        // Change user's verified status to true
+        var result = await userService.UpdateVerifiedStatusAsync(dto.ContactNumber, true);
 
-        if (getUserResult is SuccessDataResult<User> resultData)
+        if (!result.Success)
         {
-            var updateUserRequestDto = new UserUpdateRequestDto()
-            {
-                ContactNumber = getUserResult.Data.ContactNumber,
-                Username = getUserResult.Data.Username,
-                Verified = true
-            };
-            var updateUserResult = await userService.UpdateAsync(getUserResult.Data.Id, updateUserRequestDto);
-            return Ok(updateUserResult);
+            return BadRequest(result);
         }
-
-        return BadRequest(new ErrorResult(EMessages.UserIsNotExist.Translate()));
+        return Ok(result);
     }
 
     [SwaggerOperation(Summary = "refesh access token")]

@@ -43,9 +43,9 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return user?.Salt;
     }
 
-    public async Task<bool> IsUserExistbyContactNumberAsync(string contactNumber, Guid? userId)
+    public async Task<bool> IsUserExistbyContactNumberAsync(string contactNumber)
     {
-        return await _dataContext.Users.AnyAsync(m => m.ContactNumber == contactNumber && m.Id != userId);
+        return await _dataContext.Users.AnyAsync(m => m.ContactNumber == contactNumber);
     }
 
     public Task UpdateUserAsync(User user)

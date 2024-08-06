@@ -1,5 +1,4 @@
-﻿using BLL.Abstract;
-using CORE.Abstract;
+﻿using CORE.Abstract;
 using CORE.Config;
 using CORE.Localization;
 using DTO.ErrorLog;
@@ -39,7 +38,7 @@ public class ExceptionMiddleware(RequestDelegate next,
     private async Task LogErrorAsync(HttpContext httpContext, Exception ex)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IUtilService utilService = scope.ServiceProvider.GetRequiredService<IUtilService>();
+        ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
         IErrorLogService errorLogService = scope.ServiceProvider.GetRequiredService<IErrorLogService>();
 
         var traceIdentifier = httpContext.TraceIdentifier;
@@ -55,7 +54,7 @@ public class ExceptionMiddleware(RequestDelegate next,
         {
             token = httpContext.Request.Headers[authHeaderName].ToString();
             userId = !string.IsNullOrEmpty(token)
-                ? utilService.GetUserIdFromToken() : null;
+                ? tokenService.GetUserIdFromToken() : null;
         }
 
         ErrorLogCreateDto errorLogToAddDto = new()

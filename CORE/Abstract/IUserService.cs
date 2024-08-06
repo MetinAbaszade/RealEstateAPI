@@ -21,11 +21,13 @@ public interface IUserService
 
     Task<IResult> UpdateAsync(Guid id, UserUpdateRequestDto dto);
 
+    Task<IResult> UpdateVerifiedStatusAsync(string contactNumber, bool isVerified);
+
     Task<IResult> SoftDeleteAsync(Guid id);
 
     Task<IResult> SetImageAsync(Guid id, string? image = null);
 
     Task<IDataResult<string>> GetImageAsync(Guid id);
 
-    Task<IResult> ResetPasswordAsync(Guid id, ResetPasswordRequestDto dto);
+    Task<IResult> ResetPasswordAsync(Guid id, string password);
 }

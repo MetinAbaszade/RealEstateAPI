@@ -1,5 +1,4 @@
 ﻿using CORE.Abstract;
-using DAL.EntityFramework.Seeds;
 using ENTITIES.Entities;
 using ENTITIES.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -37,8 +36,6 @@ public class DataContext(DbContextOptions<DataContext> options,
         modelBuilder.AddGlobalFilter("IsDeleted", false);
 
         modelBuilder.Entity<Token>().HasQueryFilter(m => !m.IsDeleted);
-
-        DataSeed.Seed(modelBuilder);
     }
 
     private void SetAuditProperties()

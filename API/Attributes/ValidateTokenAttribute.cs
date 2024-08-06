@@ -1,5 +1,4 @@
-﻿using BLL.Abstract;
-using CORE.Abstract;
+﻿using CORE.Abstract;
 using CORE.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +19,11 @@ public class ValidateTokenAttribute : Attribute, IAuthorizationFilter
 
         var configSettings = (context.HttpContext.RequestServices.GetService(typeof(ConfigSettings)) as ConfigSettings)!;
         var tokenService = (context.HttpContext.RequestServices.GetService(typeof(ITokenService)) as ITokenService)!;
-        var utilService = (context.HttpContext.RequestServices.GetService(typeof(IUtilService)) as IUtilService)!;
 
         string? jwtToken = context.HttpContext.Request.Headers[configSettings.AuthSettings.HeaderName];
         string? refreshToken = context.HttpContext.Request.Headers[configSettings.AuthSettings.RefreshTokenHeaderName];
 
-        jwtToken = utilService.TrimToken(jwtToken);
+        jwtToken = tokenService.TrimToken(jwtToken);
 
         var validationResult = tokenService.CheckValidationAsync(jwtToken, refreshToken!).Result;
 

@@ -23,7 +23,7 @@ public class UserService(IMapper mapper,
     public async Task<IResult> AddAsync(UserCreateRequestDto dto)
     {
 
-        var userExists = await _userRepository.IsUserExistbyContactNumberAsync(dto.ContactNumber, null);
+        var userExists = await _userRepository.IsUserExistbyContactNumberAsync(dto.ContactNumber);
         if (userExists)
         {
             return new ErrorResult(EMessages.UserIsExist.Translate());
@@ -85,7 +85,7 @@ public class UserService(IMapper mapper,
 
     public async Task<IResult> UpdateAsync(Guid id, UserUpdateRequestDto dto)
     {
-        if (await _userRepository.IsUserExistbyContactNumberAsync(dto.ContactNumber, id))
+        if (await _userRepository.IsUserExistbyContactNumberAsync(dto.ContactNumber))
         {
             return new ErrorResult(EMessages.UserIsExist.Translate());
         }
@@ -94,6 +94,22 @@ public class UserService(IMapper mapper,
         data.Id = id;
 
         await _userRepository.UpdateUserAsync(data);
+
+        return new SuccessResult(EMessages.Success.Translate());
+    }
+
+    public async Task<IResult> UpdateVerifiedStatusAsync(string contactNumber, bool isVerified)
+    {
+        var getUserResult = await GetAsync(u => u.ContactNumber == contactNumber);
+        if (getUserResult is not SuccessDataResult<User>)
+        {
+            return new ErrorResult(EMessages.UserIsExist.Translate());
+        }
+
+        var user = getUserResult.Data;
+        user.Verified = isVerified;
+
+        await _userRepository.UpdateUserAsync(user);
 
         return new SuccessResult(EMessages.Success.Translate());
     }
@@ -119,7 +135,7 @@ public class UserService(IMapper mapper,
         return new SuccessDataResult<string>(EMessages.FileIsNotFound.Translate());
     }
 
-    public async Task<IResult> ResetPasswordAsync(Guid id, ResetPasswordRequestDto dto)
+    public async Task<IResult> ResetPasswordAsync(Guid id, string password)
     {
         var data = await _userRepository.GetAsync(id);
 
@@ -129,7 +145,7 @@ public class UserService(IMapper mapper,
         }
 
         data.Salt = SecurityHelper.GenerateSalt();
-        data.Password = SecurityHelper.HashPassword(dto.Password, data.Salt);
+        data.Password = SecurityHelper.HashPassword(password, data.Salt);
 
         await _userRepository.UpdateAsync(data);
 
