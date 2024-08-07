@@ -2,17 +2,14 @@
 using ENTITIES.Entities;
 using ENTITIES.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DAL.EntityFramework.Context;
 
-public class DataContext(DbContextOptions<DataContext> options,
-                         ITokenService tokenService) : DbContext(options)
+public class DataContext(DbContextOptions<DataContext> options, IServiceProvider serviceProvider) : DbContext(options)
 {
     public required DbSet<User> Users { get; set; }
-    public required DbSet<RequestLog> RequestLogs { get; set; }
-    public required DbSet<ResponseLog> ResponseLogs { get; set; }
     public required DbSet<Token> Tokens { get; set; }
-    public required DbSet<ErrorLog> ErrorLogs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -43,6 +40,8 @@ public class DataContext(DbContextOptions<DataContext> options,
         var entries = ChangeTracker
             .Entries()
             .Where(e => e.Entity is Auditable && e.State is EntityState.Added or EntityState.Modified);
+
+        var tokenService = serviceProvider.GetRequiredService<ITokenService>();
 
         foreach (var entityEntry in entries)
         {

@@ -36,8 +36,6 @@ builder.Services.AddFluentValidationAutoValidation()
 
 builder.Services.AddAutoMapper(Automapper.GetAutoMapperProfilesFromAllAssemblies().ToArray());
 
-builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(config.ConnectionStrings.AppDb));
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddMemoryCache();
@@ -48,6 +46,7 @@ builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySi
 builder.Services.RegisterRepositories();
 builder.Services.RegisterApiVersioning();
 
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(config.ConnectionStrings.AppDb));
 builder.Services.AddHealthChecks().AddNpgSql(config.ConnectionStrings.AppDb);
 
 builder.Services.RegisterAuthentication(config);
@@ -57,8 +56,6 @@ builder.Services.AddCors(o => o
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowAnyOrigin()));
-
-builder.Services.AddScoped<LogActionFilter>();
 
 builder.Services.AddScoped<ModelValidatorActionFilter>();
 
@@ -90,7 +87,6 @@ if (config.SwaggerSettings.IsEnabled)
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 app.UseMiddleware<LocalizationMiddleware>();
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

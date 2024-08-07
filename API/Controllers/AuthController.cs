@@ -18,7 +18,6 @@ using Result = DTO.Responses.Result;
 namespace API.Controllers;
 
 [Route("api/[controller]")]
-[ServiceFilter(typeof(LogActionFilter))]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class AuthController(IAuthService authService,
                             ConfigSettings configSettings,

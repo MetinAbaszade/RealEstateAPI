@@ -29,7 +29,6 @@ public class UsersController(IUserService userService,
 {
     [SwaggerOperation(Summary = "get users as paginated list")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<UserResponseDto>>))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpGet("{pageIndex}/{pageSize}")]
     public async Task<IActionResult> GetAsPaginated([FromRoute] int pageIndex, int pageSize)
     {
@@ -39,7 +38,6 @@ public class UsersController(IUserService userService,
 
     [SwaggerOperation(Summary = "get users")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<UserResponseDto>>))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
@@ -47,7 +45,6 @@ public class UsersController(IUserService userService,
         return Ok(response);
     }
 
-    [ServiceFilter(typeof(LogActionFilter))]
     [SwaggerOperation(Summary = "get profile info")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<UserResponseDto>>))]
     [HttpGet("profile")]
@@ -60,7 +57,6 @@ public class UsersController(IUserService userService,
 
     [SwaggerOperation(Summary = "get user")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<UserResponseDto>))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpGet("{id}")]
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
@@ -80,7 +76,6 @@ public class UsersController(IUserService userService,
 
     [SwaggerOperation(Summary = "update user")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateRequestDto dto)
     {
@@ -90,7 +85,6 @@ public class UsersController(IUserService userService,
 
     [SwaggerOperation(Summary = "delete user")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
@@ -131,7 +125,6 @@ public class UsersController(IUserService userService,
 
     [SwaggerOperation(Summary = "delete logged in user image")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpDelete("image")]
     public async Task<IActionResult> DeleteImage()
     {
@@ -142,7 +135,6 @@ public class UsersController(IUserService userService,
 
     [SwaggerOperation(Summary = "delete image by id")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
-    [ServiceFilter(typeof(LogActionFilter))]
     [HttpDelete("{id}/image")]
     public async Task<IActionResult> DeleteImage([FromRoute] Guid id)
     {
