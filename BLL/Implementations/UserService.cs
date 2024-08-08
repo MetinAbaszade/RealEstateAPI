@@ -39,26 +39,17 @@ public class UserService(IMapper mapper,
         return new SuccessResult(EMessages.Success.Translate());
     }
 
-    public async Task<IResult> SoftDeleteAsync(Guid id)
+    public async Task<IResult> DeleteAsync(Guid id)
     {
         var data = await _userRepository.GetAsync(id);
 
-        await _userRepository.SoftDeleteAsync(data!);
+        await _userRepository.DeleteAsync(data!);
 
         var tokens = (await _tokenRepository.GetListAsync(m => m.UserId == id)).ToList();
         tokens.ForEach(m => m.IsDeleted = true);
         await _tokenRepository.UpdateRangeAsync(tokens);
 
         return new SuccessResult(EMessages.Success.Translate());
-    }
-
-    public async Task<IResult> SetImageAsync(Guid id, string? image = null)
-    {
-        var user = await _userRepository.GetAsync(id);
-        user.Image = image;
-
-        await _userRepository.UpdateAsync(user);
-        return new SuccessResult();
     }
 
     public async Task<IDataResult<IEnumerable<UserResponseDto>>> GetListAsync()
@@ -123,16 +114,6 @@ public class UserService(IMapper mapper,
         var responseDto = new PaginatedList<UserResponseDto>(_mapper.Map<List<UserResponseDto>>(response.Datas), response.TotalRecordCount, response.PageIndex, pageSize);
 
         return new SuccessDataResult<PaginatedList<UserResponseDto>>(responseDto, EMessages.Success.Translate());
-    }
-
-    public async Task<IDataResult<string>> GetImageAsync(Guid id)
-    {
-        var user = await _userRepository.GetAsNoTrackingAsync(u => u.Id == id);
-        if (user is { Image: not null })
-        {
-            return new SuccessDataResult<string>(user.Image, EMessages.Success.Translate());
-        }
-        return new SuccessDataResult<string>(EMessages.FileIsNotFound.Translate());
     }
 
     public async Task<IResult> ResetPasswordAsync(Guid id, string password)

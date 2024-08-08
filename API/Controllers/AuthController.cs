@@ -35,7 +35,7 @@ public class AuthController(IAuthService authService,
 
         if (string.IsNullOrEmpty(userSalt))
         {
-            return Ok(new ErrorDataResult<Result>(EMessages.InvalidUserCredentials.Translate()));
+            return BadRequest(new ErrorDataResult<Result>(EMessages.InvalidUserCredentials.Translate()));
         }
 
         dto = dto with { Password = SecurityHelper.HashPassword(dto.Password, userSalt) };
@@ -63,7 +63,8 @@ public class AuthController(IAuthService authService,
             return BadRequest(registerResult);
         }
 
-        var otp = otpService.GenerateOtp();
+        // var otp = otpService.GenerateOtp();
+        var otp = "123456";
         otpService.SaveOtpinCache(dto.ContactNumber, otp);
         await otpService.SendOtpAsync(dto.ContactNumber, otp);
 
@@ -105,7 +106,7 @@ public class AuthController(IAuthService authService,
         var tokenResponse = await tokenService.GetAsync(jwtToken, refreshToken);
         if (tokenResponse.Success)
         {
-            await tokenService.SoftDeleteAsync(tokenResponse.Data!.Id);
+            await tokenService.DeleteAsync(tokenResponse.Data!.Id);
             var response = await tokenService.CreateTokenAsync(tokenResponse.Data.User);
             return Ok(response);
         }

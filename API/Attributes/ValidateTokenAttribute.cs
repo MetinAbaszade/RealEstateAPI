@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace API.Attributes;
 
-// [AttributeUsage(AttributeTargets.Method)]
 public class ValidateTokenAttribute : Attribute, IAuthorizationFilter
 {
     public void OnAuthorization(AuthorizationFilterContext context)

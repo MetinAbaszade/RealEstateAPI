@@ -12,27 +12,18 @@ namespace DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "web_user",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Salt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Verified = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    ModifiedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Verified = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_web_user", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,9 +44,9 @@ namespace DAL.Migrations
                 {
                     table.PrimaryKey("PK_Tokens", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tokens_Users_UserId",
+                        name: "FK_Tokens_web_user_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "web_user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -73,7 +64,7 @@ namespace DAL.Migrations
                 name: "Tokens");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "web_user");
         }
     }
 }

@@ -33,22 +33,6 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         await _ctx.SaveChangesAsync();
     }
 
-    public async Task SoftDeleteAsync(TEntity entity)
-    {
-        var property = entity.GetType().GetProperty(nameof(Auditable.IsDeleted)) ?? throw new ArgumentException(
-                @$"The property with type: {entity.GetType()} can not be SoftDeleted, 
-                        because it doesn't contains {nameof(Auditable.IsDeleted)} property, 
-                        and did not implemented {typeof(Auditable)}.");
-        if (((bool?)property.GetValue(entity)!).Value)
-        {
-            throw new Exception("This entity was already deleted.");
-        }
-
-        property.SetValue(entity, true);
-        _ctx.Update(entity);
-        await _ctx.SaveChangesAsync();
-    }
-
     public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> filter, bool ignoreQueryFilters = false)
     {
         return ignoreQueryFilters

@@ -25,7 +25,7 @@ public static class DependencyContainer
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = false,
+                    ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.AuthSettings.SecretKey)),
                     ValidateIssuer = false,
                     ValidateAudience = false,

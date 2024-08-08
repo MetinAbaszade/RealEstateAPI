@@ -1,9 +1,7 @@
 ﻿using CORE.Abstract;
 using CORE.Localization;
-using DTO.Auth;
 using DTO.Responses;
 using Microsoft.Extensions.Caching.Memory;
-using static System.Net.WebRequestMethods;
 
 namespace BLL.Implementations;
 internal class OtpService(IMemoryCache memoryCache) : IOtpService

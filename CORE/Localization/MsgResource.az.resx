@@ -153,4 +153,7 @@
   <data name="InvalidVerificationCode" xml:space="preserve">
     <value>Təsdiq kodu düzgün daxil edilməyib</value>
   </data>
+  <data name="VerificationCodeSent" xml:space="preserve">
+    <value>Təsdiq kodu uğurla göndərildi</value>
+  </data>
 </root>

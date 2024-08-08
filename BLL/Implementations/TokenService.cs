@@ -74,10 +74,10 @@ public class TokenService(ConfigSettings configSettings,
         return new SuccessDataResult<LoginResponseDto>(loginResponseDto, EMessages.Success.Translate());
     }
 
-    public async Task<DTO.Responses.IResult> SoftDeleteAsync(Guid id)
+    public async Task<DTO.Responses.IResult> DeleteAsync(Guid id)
     {
         var data = await tokenRepository.GetAsync(id);
-        await tokenRepository.SoftDeleteAsync(data!);
+        await tokenRepository.DeleteAsync(data!);
 
         return new SuccessResult(EMessages.Success.Translate());
     }

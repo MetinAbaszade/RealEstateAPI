@@ -2,6 +2,7 @@
 using CORE.Localization;
 using DTO.Auth;
 using DTO.Responses;
+using ENTITIES.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,13 +30,14 @@ public class OtpController : ControllerBase
     [HttpPost("sendotp")]
     public async Task<IActionResult> SendOtp([FromBody] SendOtpRequestDto dto)
     {
-        var user = await userService.GetAsync(u => u.ContactNumber == dto.ContactNumber);
-        if (user == null)
+        var getUserResult = await userService.GetAsync(u => u.ContactNumber == dto.ContactNumber);
+        if (getUserResult is not SuccessDataResult<User>)
         {
             return BadRequest(new ErrorResult(EMessages.UserIsNotExist.Translate()));
         }
 
-        var otp = otpService.GenerateOtp();
+        // var otp = otpService.GenerateOtp();
+        var otp = "123456";
         otpService.SaveOtpinCache(dto.ContactNumber, otp);
         await otpService.SendOtpAsync(dto.ContactNumber, otp);
 

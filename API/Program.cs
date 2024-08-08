@@ -1,4 +1,5 @@
-﻿using API.Containers;
+﻿using API.Attributes;
+using API.Containers;
 using API.Filters;
 using API.Middlewares;
 using BLL.Mappers;
@@ -58,6 +59,7 @@ builder.Services.AddCors(o => o
                 .AllowAnyOrigin()));
 
 builder.Services.AddScoped<ModelValidatorActionFilter>();
+builder.Services.AddScoped<ValidateTokenAttribute>();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -90,6 +92,10 @@ app.UseMiddleware<LocalizationMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
+app.UseAuthorization();
+
 app.Use((context, next) =>
 {
     context.Request.EnableBuffering();
@@ -110,10 +116,6 @@ app.Use(async (context, next) =>
 app.UseStaticFiles();
 
 app.UseCors(Constants.CORS_POLICY_NAME);
-
-app.UseAuthorization();
-
-app.UseAuthentication();
 
 app.UseMiniProfiler();
 

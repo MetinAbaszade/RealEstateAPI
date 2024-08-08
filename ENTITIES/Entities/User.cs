@@ -1,14 +1,14 @@
 ﻿using ENTITIES.Entities.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ENTITIES.Entities;
 
-public class User : Auditable, IEntity
+[Table("web_user")]
+public class User : IEntity
 {
-    public Guid Id { get; set; }
-    public string? Image { get; set; }
-    public required string Username { get; set; }
+    public Guid Id { get; set; } = new();
     public required string Password { get; set; }
     public required string ContactNumber { get; set; }
     public required string Salt { get; set; }
-    public bool Verified { get; set; } = false;
+    public required bool Verified { get; set; } = false;
 }

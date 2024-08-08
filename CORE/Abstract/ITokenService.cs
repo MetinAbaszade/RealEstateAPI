@@ -9,7 +9,7 @@ public interface ITokenService
 {
     Task<IResult> AddAsync(LoginResponseDto dto);
 
-    Task<IResult> SoftDeleteAsync(Guid id);
+    Task<IResult> DeleteAsync(Guid id);
 
     Task<IDataResult<TokenToListDto>> GetAsync(string accessToken, string refreshToken);
 

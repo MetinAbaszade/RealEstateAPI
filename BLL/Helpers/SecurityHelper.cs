@@ -52,9 +52,8 @@ public class SecurityHelper
     {
         var claims = new List<Claim>
     {
-        new(_configSettings.AuthSettings.TokenUserIdKey, _utilService.Encrypt(userDto.Id.ToString())),
-        new(ClaimTypes.Name, userDto.Username),
-        new(ClaimTypes.Expiration, expirationDate.ToString(CultureInfo.InvariantCulture))
+        new Claim(JwtRegisteredClaimNames.Sub, userDto.Id.ToString()), // Standard subject claim
+        new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(expirationDate).ToUnixTimeSeconds().ToString()) // Expiration in Unix time
     };
 
         var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configSettings.AuthSettings.SecretKey));
@@ -72,4 +71,5 @@ public class SecurityHelper
 
         return tokenHandler.WriteToken(token);
     }
+
 }
