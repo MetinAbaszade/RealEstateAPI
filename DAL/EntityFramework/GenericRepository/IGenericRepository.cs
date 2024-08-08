@@ -5,9 +5,7 @@ namespace DAL.EntityFramework.GenericRepository;
 public interface IGenericRepository<T> where T : class
 {
     Task<IEnumerable<T>> GetListAsync(Expression<Func<T, bool>>? filter = null, bool ignoreQueryFilters = false);
-    Task<T?> GetAsync(Expression<Func<T, bool>> filter, bool ignoreQueryFilters = false);
-    Task<T> GetAsync(Guid id);
-    IQueryable<T> Get(Expression<Func<T, bool>> filter, bool ignoreQueryFilters = false);
+    Task<T?> GetAsync(Guid id);
     IQueryable<T> GetList(Expression<Func<T, bool>>? filter = null, bool ignoreQueryFilters = false);
     Task<T?> GetAsNoTrackingAsync(Expression<Func<T, bool>> filter);
     Task<T?> GetAsNoTrackingWithIdentityResolutionAsync(Expression<Func<T, bool>> filter);
@@ -22,6 +20,7 @@ public interface IGenericRepository<T> where T : class
     Task<T> AddAsync(T entity);
     Task<T> UpdateAsync(T entity);
     Task DeleteAsync(T entity);
+    Task DeleteRangeAsync(List<T> entity);
     Task<List<T>> AddRangeAsync(List<T> entity);
     Task<List<T>> UpdateRangeAsync(List<T> entity);
 }

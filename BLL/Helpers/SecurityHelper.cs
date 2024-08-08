@@ -11,17 +11,8 @@ using System.Text;
 
 namespace BLL.Helpers;
 
-public class SecurityHelper
+public class SecurityHelper(ConfigSettings configSettings)
 {
-    private readonly ConfigSettings _configSettings;
-    private readonly IUtilService _utilService;
-
-    public SecurityHelper(ConfigSettings configSettings, IUtilService utilService)
-    {
-        _configSettings = configSettings;
-        _utilService = utilService;
-    }
-
     public static string GenerateSalt()
     {
         var saltBytes = new byte[16];
@@ -56,7 +47,7 @@ public class SecurityHelper
         new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(expirationDate).ToUnixTimeSeconds().ToString()) // Expiration in Unix time
     };
 
-        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configSettings.AuthSettings.SecretKey));
+        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configSettings.AuthSettings.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -71,5 +62,4 @@ public class SecurityHelper
 
         return tokenHandler.WriteToken(token);
     }
-
 }

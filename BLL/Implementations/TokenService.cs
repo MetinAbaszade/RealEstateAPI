@@ -57,7 +57,7 @@ public class TokenService(ConfigSettings configSettings,
 
     public async Task<IDataResult<LoginResponseDto>> CreateTokenAsync(UserResponseDto dto)
     {
-        var securityHelper = new SecurityHelper(configSettings, utilService);
+        var securityHelper = new SecurityHelper(configSettings);
         var accessTokenExpireDate = DateTime.UtcNow.AddHours(configSettings.AuthSettings.TokenExpirationTimeInHours);
 
         var loginResponseDto = new LoginResponseDto()
@@ -79,6 +79,12 @@ public class TokenService(ConfigSettings configSettings,
         var data = await tokenRepository.GetAsync(id);
         await tokenRepository.DeleteAsync(data!);
 
+        return new SuccessResult(EMessages.Success.Translate());
+    }
+
+    public async Task<DTO.Responses.IResult> DeleteRangeAsync(List<Token> tokenstobeDeleted)
+    {
+        await tokenRepository.DeleteRangeAsync(tokenstobeDeleted);
         return new SuccessResult(EMessages.Success.Translate());
     }
 

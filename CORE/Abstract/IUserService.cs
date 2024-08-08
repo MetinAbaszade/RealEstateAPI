@@ -1,5 +1,4 @@
 ﻿using CORE.Utility;
-using DTO.Auth;
 using DTO.Responses;
 using DTO.User;
 using ENTITIES.Entities;

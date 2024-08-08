@@ -4,7 +4,6 @@ using DTO.Auth;
 using DTO.Responses;
 using ENTITIES.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using IResult = DTO.Responses.IResult;
@@ -14,17 +13,8 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [AllowAnonymous]
-public class OtpController : ControllerBase
+public class OtpController(IOtpService otpService, IUserService userService) : ControllerBase
 {
-    private readonly IOtpService otpService;
-    private readonly IUserService userService;
-
-    public OtpController(IOtpService otpService, IUserService userService)
-    {
-        this.otpService = otpService;
-        this.userService = userService;
-    }
-
     [SwaggerOperation(Summary = "Send Otp")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
     [HttpPost("sendotp")]

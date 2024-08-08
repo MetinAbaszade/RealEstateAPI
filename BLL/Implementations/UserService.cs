@@ -4,7 +4,6 @@ using CORE.Abstract;
 using CORE.Localization;
 using CORE.Utility;
 using DAL.EntityFramework.Abstract;
-using DTO.Auth;
 using DTO.Responses;
 using DTO.User;
 using ENTITIES.Entities;
@@ -13,12 +12,10 @@ using System.Linq.Expressions;
 namespace BLL.Implementations;
 
 public class UserService(IMapper mapper,
-                         IUserRepository userRepository,
-                         ITokenRepository tokenRepository) : IUserService
+                         IUserRepository userRepository) : IUserService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUserRepository _userRepository = userRepository;
-    private readonly ITokenRepository _tokenRepository = tokenRepository;
 
     public async Task<IResult> AddAsync(UserCreateRequestDto dto)
     {
@@ -45,10 +42,6 @@ public class UserService(IMapper mapper,
 
         await _userRepository.DeleteAsync(data!);
 
-        var tokens = (await _tokenRepository.GetListAsync(m => m.UserId == id)).ToList();
-        tokens.ForEach(m => m.IsDeleted = true);
-        await _tokenRepository.UpdateRangeAsync(tokens);
-
         return new SuccessResult(EMessages.Success.Translate());
     }
 
@@ -60,17 +53,18 @@ public class UserService(IMapper mapper,
 
     public async Task<IDataResult<UserByIdResponseDto>> GetAsync(Guid id)
     {
-        var data = _mapper.Map<UserByIdResponseDto>(await _userRepository.GetAsync(m => m.Id == id));
+        var user = await _userRepository.GetAsync(id);
+        if (user == null)
+            return new ErrorDataResult<UserByIdResponseDto>(EMessages.UserIsExist.Translate());
+        var data = _mapper.Map<UserByIdResponseDto>(await _userRepository.GetAsync(id));
         return new SuccessDataResult<UserByIdResponseDto>(data, EMessages.Success.Translate());
     }
 
-    public async Task<IDataResult<User>> GetAsync(Expression<Func<User, bool>> filter)
+    public async Task<IDataResult<User>?> GetAsync(Expression<Func<User, bool>> filter)
     {
-        var user = await _userRepository.GetAsync(filter);
+        var user = await _userRepository.SingleOrDefaultAsync(filter);
         if (user is null)
-        {
-            return new ErrorDataResult<User>(EMessages.UserIsNotExist.Translate());
-        }
+            return new ErrorDataResult<User>(EMessages.UserIsExist.Translate());
         return new SuccessDataResult<User>(user, EMessages.Success.Translate());
     }
 
@@ -91,13 +85,12 @@ public class UserService(IMapper mapper,
 
     public async Task<IResult> UpdateVerifiedStatusAsync(string contactNumber, bool isVerified)
     {
-        var getUserResult = await GetAsync(u => u.ContactNumber == contactNumber);
-        if (getUserResult is not SuccessDataResult<User>)
+        var user = await _userRepository.SingleOrDefaultAsync(u => u.ContactNumber == contactNumber);
+        if (user is null)
         {
             return new ErrorResult(EMessages.UserIsExist.Translate());
         }
 
-        var user = getUserResult.Data;
         user.Verified = isVerified;
 
         await _userRepository.UpdateUserAsync(user);

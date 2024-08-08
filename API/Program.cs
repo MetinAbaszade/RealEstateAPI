@@ -5,8 +5,8 @@ using API.Middlewares;
 using BLL.Mappers;
 using CORE.Config;
 using CORE.Constants;
-using DAL.EntityFramework.Context;
 using DTO;
+using ENTITIES.Entities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
@@ -47,7 +47,7 @@ builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySi
 builder.Services.RegisterRepositories();
 builder.Services.RegisterApiVersioning();
 
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(config.ConnectionStrings.AppDb));
+builder.Services.AddDbContext<DbestateContext>(options => options.UseSqlServer(config.ConnectionStrings.AppDb));
 builder.Services.AddHealthChecks().AddNpgSql(config.ConnectionStrings.AppDb);
 
 builder.Services.RegisterAuthentication(config);

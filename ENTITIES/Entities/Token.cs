@@ -4,7 +4,7 @@ namespace ENTITIES.Entities;
 
 public class Token : IEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required User User { get; set; }
     public Guid UserId { get; set; }
     public required string AccessToken { get; set; }
@@ -13,5 +13,4 @@ public class Token : IEntity
     public DateTimeOffset RefreshTokenExpireDate { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTimeOffset? DeletedAt { get; set; }
-    public bool IsDeleted { get; set; }
 }

@@ -9,7 +9,6 @@ public interface IUserRepository : IGenericRepository<User>
     Task<bool> IsUserExistbyContactNumberAsync(string contactNumber);
     Task<string?> GetUserSaltAsync(string contactNumber);
     Task UpdateUserAsync(User user);
-    Task<User> GetAsync(Expression<Func<User, bool>> filter);
     IQueryable<User> GetList(Expression<Func<User, bool>>? filter = null);
     Task<IEnumerable<User>> GetListAsync(Expression<Func<User, bool>>? filter = null);
 }

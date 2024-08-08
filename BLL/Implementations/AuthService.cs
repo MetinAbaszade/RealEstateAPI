@@ -10,8 +10,8 @@ namespace BLL.Implementations;
 
 public class AuthService(IMapper mapper,
                          IUserRepository userRepository,
-                         ITokenRepository tokenRepository,
-                         ITokenService tokenService) : IAuthService
+                         ITokenService tokenService,
+                         ITokenRepository tokenRepository) : IAuthService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUserRepository _userRepository = userRepository;
@@ -25,8 +25,8 @@ public class AuthService(IMapper mapper,
 
     public async Task<IDataResult<UserResponseDto>> LoginAsync(LoginRequestDto dto)
     {
-        var data = await _userRepository.GetAsync(m => m.ContactNumber == dto.ContactNumber &&
-                                                          m.Password == dto.Password);
+        var data = await _userRepository.SingleOrDefaultAsync(m => m.ContactNumber == dto.ContactNumber &&
+                                                                      m.Password == dto.Password);
 
         if (data == null)
         {
@@ -40,7 +40,7 @@ public class AuthService(IMapper mapper,
     {
         var userId = _tokenService.GetUserIdFromToken();
 
-        var data = await _userRepository.GetAsync(m => m.Id == userId);
+        var data = await _userRepository.SingleOrDefaultAsync(m => m.Id == userId);
         if (data == null)
         {
             return new ErrorDataResult<UserResponseDto>(EMessages.InvalidUserCredentials.Translate());
@@ -51,9 +51,8 @@ public class AuthService(IMapper mapper,
 
     public async Task<IResult> LogoutAsync(string accessToken)
     {
-        var tokens = await _tokenRepository.GetActiveTokensAsync(accessToken);
-        tokens.ForEach(m => m.IsDeleted = true);
-        await _tokenRepository.UpdateRangeAsync(tokens);
+        var token = await _tokenRepository.SingleAsync(t => t.AccessToken == accessToken);
+        await _tokenService.DeleteAsync(token.Id);
 
         return new SuccessResult(EMessages.Success.Translate());
     }
@@ -61,8 +60,7 @@ public class AuthService(IMapper mapper,
     public async Task<IResult> LogoutRemovedUserAsync(Guid userId)
     {
         var tokens = (await _tokenRepository.GetListAsync(m => m.UserId == userId)).ToList();
-        tokens.ForEach(m => m.IsDeleted = true);
-        await _tokenRepository.UpdateRangeAsync(tokens);
+        await _tokenService.DeleteRangeAsync(tokens);
 
         return new SuccessResult(EMessages.Success.Translate());
     }
