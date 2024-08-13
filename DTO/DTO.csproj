@@ -26,7 +26,6 @@
         <None Remove="Permission\" />
         <None Remove="Token\" />
         <None Remove="CustomLogging\Validators\" />
-        <None Remove="Permission\Validators\" />
         <None Remove="Responses\Validators\" />
         <None Remove="Token\Validators\" />
     </ItemGroup>

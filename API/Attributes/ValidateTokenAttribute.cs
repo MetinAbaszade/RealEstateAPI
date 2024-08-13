@@ -19,7 +19,7 @@ public class ValidateTokenAttribute : Attribute, IAuthorizationFilter
         var configSettings = (context.HttpContext.RequestServices.GetService(typeof(ConfigSettings)) as ConfigSettings)!;
         var tokenService = (context.HttpContext.RequestServices.GetService(typeof(ITokenService)) as ITokenService)!;
 
-        string? jwtToken = context.HttpContext.Request.Headers[configSettings.AuthSettings.HeaderName];
+        string? jwtToken = tokenService.GetTokenString();
         string? refreshToken = context.HttpContext.Request.Headers[configSettings.AuthSettings.RefreshTokenHeaderName];
 
         jwtToken = tokenService.TrimToken(jwtToken);

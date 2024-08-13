@@ -23,15 +23,14 @@ public class OtpController(IOtpService otpService, IUserService userService) : C
         var getUserResult = await userService.GetAsync(u => u.ContactNumber == dto.ContactNumber);
         if (getUserResult is not SuccessDataResult<User>)
         {
-            return BadRequest(new ErrorResult(EMessages.UserIsNotExist.Translate()));
+            return NotFound(new ErrorResult(EMessages.UserIsNotExist.Translate()));
         }
 
         // var otp = otpService.GenerateOtp();
         var otp = "123456";
         otpService.SaveOtpinCache(dto.ContactNumber, otp);
-        await otpService.SendOtpAsync(dto.ContactNumber, otp);
-
-        return Ok(new SuccessResult(EMessages.Success.Translate()));
+        var result = await otpService.SendOtpAsync(dto.ContactNumber, otp);
+        return Ok(result);
     }
 
     [SwaggerOperation(Summary = "validate otp")]
@@ -42,7 +41,7 @@ public class OtpController(IOtpService otpService, IUserService userService) : C
         var isValid = otpService.ValidateOtp(dto.ContactNumber, dto.Otp);
         if (!isValid)
         {
-            return BadRequest(new ErrorResult(EMessages.InvalidVerificationCode.Translate()));
+            return UnprocessableEntity(new ErrorResult(EMessages.InvalidVerificationCode.Translate()));
         }
 
         return Ok(new SuccessResult(EMessages.Success.Translate()));

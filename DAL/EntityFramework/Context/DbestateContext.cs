@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ENTITIES.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace ENTITIES.Entities;
+namespace DAL.Context;
 
 public partial class DbestateContext : DbContext
 {
@@ -13,36 +14,37 @@ public partial class DbestateContext : DbContext
     {
     }
 
-    public virtual required DbSet<BuildingType> BuildingTypes { get; set; }
+    public virtual DbSet<BuildingType> BuildingTypes { get; set; }
 
-    public virtual required DbSet<Currency> Currencies { get; set; }
+    public virtual DbSet<Currency> Currencies { get; set; }
 
-    public virtual required DbSet<Document> Documents { get; set; }
+    public virtual DbSet<Document> Documents { get; set; }
 
-    public virtual required DbSet<OperationType> OperationTypes { get; set; }
+    public virtual DbSet<OperationType> OperationTypes { get; set; }
 
-    public virtual required DbSet<OwnerType> OwnerTypes { get; set; }
+    public virtual DbSet<OwnerType> OwnerTypes { get; set; }
 
-    public virtual required DbSet<PropertyType> PropertyTypes { get; set; }
+    public virtual DbSet<Property> Properties { get; set; }
 
-    public virtual required DbSet<Region> Regions { get; set; }
+    public virtual DbSet<PropertyType> PropertyTypes { get; set; }
 
-    public virtual required DbSet<RegionUnit01> RegionUnit01s { get; set; }
+    public virtual DbSet<Region> Regions { get; set; }
 
-    public virtual required DbSet<RepairRate> RepairRates { get; set; }
+    public virtual DbSet<RegionUnit01> RegionUnit01s { get; set; }
 
-    public virtual required DbSet<RoomCount> RoomCounts { get; set; }
+    public virtual DbSet<RepairRate> RepairRates { get; set; }
 
-    public virtual required DbSet<Target> Targets { get; set; }
+    public virtual DbSet<RoomCount> RoomCounts { get; set; }
 
-    public virtual required DbSet<Token> Tokens { get; set; }
+    public virtual DbSet<Target> Targets { get; set; }
 
-    public virtual required DbSet<User> Users { get; set; }
+    public virtual DbSet<Token> Tokens { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.EnableSensitiveDataLogging();
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=MATINNOTEBOOK;Initial Catalog=dbestate;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -138,6 +140,75 @@ public partial class DbestateContext : DbContext
             entity.Property(e => e.OwnerTypeName)
                 .HasMaxLength(50)
                 .HasColumnName("owner_type_name");
+        });
+
+        modelBuilder.Entity<Property>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("property");
+
+            entity.Property(e => e.Address)
+                .HasColumnType("ntext")
+                .HasColumnName("address");
+            entity.Property(e => e.ApprovmentMessage)
+                .HasMaxLength(255)
+                .HasColumnName("approvment_message");
+            entity.Property(e => e.ApprovmentStatus).HasColumnName("approvment_status");
+            entity.Property(e => e.Area).HasColumnName("area");
+            entity.Property(e => e.Code)
+                .HasMaxLength(50)
+                .HasColumnName("code");
+            entity.Property(e => e.CpName)
+                .HasMaxLength(50)
+                .HasColumnName("cp_name");
+            entity.Property(e => e.CpPhoneNumber01)
+                .HasMaxLength(50)
+                .HasColumnName("cp_phone_number_01");
+            entity.Property(e => e.CpPhoneNumber02)
+                .HasMaxLength(50)
+                .HasColumnName("cp_phone_number_02");
+            entity.Property(e => e.CpPhoneNumber03)
+                .HasMaxLength(50)
+                .HasColumnName("cp_phone_number_03");
+            entity.Property(e => e.Data)
+                .HasColumnType("ntext")
+                .HasColumnName("data");
+            entity.Property(e => e.EX)
+                .HasMaxLength(50)
+                .HasColumnName("eX");
+            entity.Property(e => e.EY)
+                .HasMaxLength(50)
+                .HasColumnName("eY");
+            entity.Property(e => e.FkIdBuildingType).HasColumnName("fk_id_building_type");
+            entity.Property(e => e.FkIdCity).HasColumnName("fk_id_city");
+            entity.Property(e => e.FkIdCurrency).HasColumnName("fk_id_currency");
+            entity.Property(e => e.FkIdDocument).HasColumnName("fk_id_document");
+            entity.Property(e => e.FkIdLink).HasColumnName("fk_id_link");
+            entity.Property(e => e.FkIdMetro).HasColumnName("fk_id_metro");
+            entity.Property(e => e.FkIdOperationType).HasColumnName("fk_id_operation_type");
+            entity.Property(e => e.FkIdOwnerType).HasColumnName("fk_id_owner_type");
+            entity.Property(e => e.FkIdPropertyType).HasColumnName("fk_id_property_type");
+            entity.Property(e => e.FkIdRepair).HasColumnName("fk_id_repair");
+            entity.Property(e => e.FkIdRoom).HasColumnName("fk_id_room");
+            entity.Property(e => e.FkIdSource).HasColumnName("fk_id_source");
+            entity.Property(e => e.FkIdTarget).HasColumnName("fk_id_target");
+            entity.Property(e => e.Floor).HasColumnName("floor");
+            entity.Property(e => e.FloorOf).HasColumnName("floor_of");
+            entity.Property(e => e.GeneralArea).HasColumnName("general_area");
+            entity.Property(e => e.IdProperty).HasColumnName("id_property");
+            entity.Property(e => e.Images)
+                .HasColumnType("ntext")
+                .HasColumnName("images");
+            entity.Property(e => e.InsertDate)
+                .HasPrecision(3)
+                .HasColumnName("insert_date");
+            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.UnitPrice).HasColumnName("unit_price");
+            entity.Property(e => e.UploadMessage)
+                .HasMaxLength(250)
+                .HasColumnName("upload_message");
+            entity.Property(e => e.UploadStatus).HasColumnName("upload_status");
         });
 
         modelBuilder.Entity<PropertyType>(entity =>

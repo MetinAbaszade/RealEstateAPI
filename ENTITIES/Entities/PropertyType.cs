@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ENTITIES.Entities;
 
-public partial class PropertyType
+public class PropertyType
 {
     public int IdPropertyType { get; set; }
 

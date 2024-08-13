@@ -1,5 +1,6 @@
-﻿using ENTITIES.Entities;
+﻿using DAL.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Linq.Expressions;
 
 namespace DAL.EntityFramework.GenericRepository;
@@ -138,7 +139,7 @@ public class GenericRepository<TEntity>(DbestateContext ctx) : IGenericRepositor
          ? await ctx.Set<TEntity>().IgnoreQueryFilters().SingleAsync(filter)
          : await ctx.Set<TEntity>().SingleAsync(filter);
     }
-    
+
     public async Task<TEntity?> FirstAsync(Expression<Func<TEntity, bool>> filter, bool ignoreQueryFilters = false)
     {
         return ignoreQueryFilters
@@ -150,5 +151,38 @@ public class GenericRepository<TEntity>(DbestateContext ctx) : IGenericRepositor
     {
         ctx.RemoveRange(entity);
         await ctx.SaveChangesAsync();
+    }
+
+    public async Task<List<TResult>> ExecuteRawSqlAsync<TResult>(string sql) where TResult : class, new()
+    {
+        using (var command = ctx.Database.GetDbConnection().CreateCommand())
+        {
+            command.CommandText = sql;
+            command.CommandType = CommandType.Text;
+
+            ctx.Database.OpenConnection();
+
+            using (var result = await command.ExecuteReaderAsync())
+            {
+                var entities = new List<TResult>();
+
+                while (await result.ReadAsync())
+                {
+                    var entity = new TResult();
+                    for (var i = 0; i < result.FieldCount; i++)
+                    {
+                        var property = entity.GetType().GetProperty(result.GetName(i));
+                        if (property != null && !DBNull.Value.Equals(result.GetValue(i)))
+                        {
+                            property.SetValue(entity, result.GetValue(i));
+                        }
+                    }
+
+                    entities.Add(entity);
+                }
+
+                return entities;
+            }
+        }
     }
 }

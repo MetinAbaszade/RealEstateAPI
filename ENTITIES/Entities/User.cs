@@ -1,10 +1,10 @@
-﻿using ENTITIES.Entities;
+﻿using ENTITIES.Entities.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ENTITIES.Entities;
 
 [Table("web_user")]
-public class User
+public class User : IEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public required string Password { get; set; }

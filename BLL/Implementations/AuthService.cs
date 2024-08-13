@@ -27,7 +27,6 @@ public class AuthService(IMapper mapper,
     {
         var data = await _userRepository.SingleOrDefaultAsync(m => m.ContactNumber == dto.ContactNumber &&
                                                                       m.Password == dto.Password);
-
         if (data == null)
         {
             return new ErrorDataResult<UserResponseDto>(EMessages.InvalidUserCredentials.Translate());

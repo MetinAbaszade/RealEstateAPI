@@ -3,6 +3,8 @@ using BLL.Implementations;
 using CORE.Abstract;
 using CORE.Config;
 using DAL.EntityFramework;
+using DAL.EntityFramework.GenericRepository;
+using ENTITIES.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

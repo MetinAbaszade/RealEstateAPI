@@ -71,7 +71,7 @@ public class AuthController(IAuthService authService,
         return Ok(registerResult);
     }
 
-    [SwaggerOperation(Summary = "validat eotp")]
+    [SwaggerOperation(Summary = "validat otp")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
     [HttpPost("validateotp")]
     [AllowAnonymous]
@@ -97,9 +97,10 @@ public class AuthController(IAuthService authService,
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<LoginResponseDto>))]
     [ValidateToken]
     [HttpGet("refresh/token")]
+    [AllowAnonymous]
     public async Task<IActionResult> RefreshToken()
     {
-        var jwtToken = tokenService.TrimToken(HttpContext.Request.Headers[configSettings.AuthSettings.HeaderName]!);
+        var jwtToken = tokenService.TrimToken(tokenService.GetTokenString()!);
 
         string refreshToken = HttpContext.Request.Headers[configSettings.AuthSettings.RefreshTokenHeaderName]!;
 

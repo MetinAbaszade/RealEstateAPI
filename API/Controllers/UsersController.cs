@@ -61,6 +61,8 @@ public class UsersController(IUserService userService,
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
         var response = await userService.GetAsync(id);
+        if (response is ErrorDataResult<UserByIdResponseDto>)
+            return NotFound(response);
         return Ok(response);
     }
 
@@ -71,6 +73,8 @@ public class UsersController(IUserService userService,
     public async Task<IActionResult> Add([FromBody] UserCreateRequestDto dto)
     {
         var response = await userService.AddAsync(dto);
+        if (response is ErrorResult)
+            return Conflict(response);
         return Ok(response);
     }
 
@@ -80,6 +84,8 @@ public class UsersController(IUserService userService,
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateRequestDto dto)
     {
         var response = await userService.UpdateAsync(id, dto);
+        if (response is ErrorResult)
+            return NotFound(response);
         return Ok(response);
     }
 
@@ -97,7 +103,7 @@ public class UsersController(IUserService userService,
         var response = await userService.ResetPasswordAsync(id, request.Password);
         if (!response.Success)
         {
-            return BadRequest(response);
+            return NotFound(response);
         }
 
         await authService.LogoutRemovedUserAsync(id);
