@@ -8,7 +8,7 @@ using System.Text;
 
 namespace BLL.Implementations;
 
-public class UtilService(ConfigSettings config, IHttpContextAccessor context, IWebHostEnvironment environment) : IUtilService
+public class UtilService(ConfigSettings config, IWebHostEnvironment environment) : IUtilService
 {
 
     public string Encrypt(string value)

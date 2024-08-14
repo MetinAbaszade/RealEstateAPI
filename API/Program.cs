@@ -47,8 +47,7 @@ builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySi
 builder.Services.RegisterRepositories();
 builder.Services.RegisterApiVersioning();
 
-builder.Services.AddDbContext<DbestateContext>(options => options.UseSqlServer(config.ConnectionStrings.AppDb));
-builder.Services.AddHealthChecks().AddNpgSql(config.ConnectionStrings.AppDb);
+builder.Services.AddDbContext<PropertyDbContext>(options => options.UseSqlServer(config.ConnectionStrings.AppDb));
 
 builder.Services.RegisterAuthentication(config);
 
@@ -86,9 +85,8 @@ if (config.SwaggerSettings.IsEnabled)
     });
 }
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 app.UseMiddleware<LocalizationMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
@@ -102,29 +100,11 @@ app.Use((context, next) =>
     return next();
 });
 
-/* response secutiry headers
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'");
-    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-    context.Response.Headers.Add("X-Frame-Options", "Deny");
-    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    await next.Invoke();
-});*/
-
 app.UseStaticFiles();
 
 app.UseCors(Constants.CORS_POLICY_NAME);
 
 app.UseMiniProfiler();
-
-app.MapHealthChecks(
-    "/health",
-    new HealthCheckOptions
-    {
-        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-    });
 
 app.MapControllers();
 

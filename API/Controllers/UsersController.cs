@@ -22,7 +22,6 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ValidateToken]
 public class UsersController(IUserService userService,
-                             IUtilService utilService,
                              ITokenService tokenService,
                              IAuthService authService,
                              IOtpService otpService) : Controller
@@ -61,21 +60,16 @@ public class UsersController(IUserService userService,
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
         var response = await userService.GetAsync(id);
-        if (response is ErrorDataResult<UserByIdResponseDto>)
-            return NotFound(response);
-        return Ok(response);
+        return response is ErrorDataResult<UserByIdResponseDto> ? NotFound(response) : Ok(response);
     }
 
     [SwaggerOperation(Summary = "create user")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IResult))]
     [HttpPost]
-    [AllowAnonymous]
     public async Task<IActionResult> Add([FromBody] UserCreateRequestDto dto)
     {
         var response = await userService.AddAsync(dto);
-        if (response is ErrorResult)
-            return Conflict(response);
-        return Ok(response);
+        return response is ErrorResult ? Conflict(response) : Ok(response);
     }
 
     [SwaggerOperation(Summary = "update user")]
@@ -84,9 +78,7 @@ public class UsersController(IUserService userService,
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateRequestDto dto)
     {
         var response = await userService.UpdateAsync(id, dto);
-        if (response is ErrorResult)
-            return NotFound(response);
-        return Ok(response);
+        return response is ErrorResult ? NotFound(response) : Ok(response);
     }
 
     [SwaggerOperation(Summary = "reset user password by id")]

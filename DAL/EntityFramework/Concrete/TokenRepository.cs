@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace DAL.EntityFramework.Concrete;
 
-public class TokenRepository(DbestateContext dataContext) : GenericRepository<Token>(dataContext), ITokenRepository
+public class TokenRepository(PropertyDbContext dataContext) : GenericRepository<Token>(dataContext), ITokenRepository
 {
     public async Task<bool> IsValidAsync(string accessToken, string refreshToken)
     {

@@ -21,7 +21,7 @@ public class PropertiesController(IPropertyService propertyService) : Controller
 
     [SwaggerOperation(Summary = "get properties as paginated list")]
     [SwaggerResponse(StatusCodes.Status200OK, type: typeof(IDataResult<List<Property>>))]
-    [HttpGet()]
+    [HttpGet]
     public async Task<IActionResult> GetAsPaginated([FromQuery] GetPropertiesRequestDto dto)
     {
         var response = await propertyService.GetAsPaginatedListAsync(dto);

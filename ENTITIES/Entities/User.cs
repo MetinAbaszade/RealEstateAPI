@@ -12,4 +12,5 @@ public class User : IEntity
     public required string Salt { get; set; }
     public required bool Verified { get; set; } = false;
     public virtual ICollection<Token> Tokens { get; set; } = [];
+    public virtual ICollection<Favourite> Favourites { get; set; } = [];
 }

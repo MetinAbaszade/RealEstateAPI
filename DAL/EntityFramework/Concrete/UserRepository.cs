@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace DAL.EntityFramework.Concrete;
 
-public class UserRepository(DbestateContext dataContext) : GenericRepository<User>(dataContext), IUserRepository
+public class UserRepository(PropertyDbContext dataContext) : GenericRepository<User>(dataContext), IUserRepository
 {
     public IQueryable<User> GetList(Expression<Func<User, bool>>? filter = null)
     {

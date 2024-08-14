@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace DAL.EntityFramework.GenericRepository;
 
-public class GenericRepository<TEntity>(DbestateContext ctx) : IGenericRepository<TEntity> where TEntity : class
+public class GenericRepository<TEntity>(PropertyDbContext ctx) : IGenericRepository<TEntity> where TEntity : class
 {
     public async Task<TEntity> AddAsync(TEntity entity)
     {
@@ -155,34 +155,57 @@ public class GenericRepository<TEntity>(DbestateContext ctx) : IGenericRepositor
 
     public async Task<List<TResult>> ExecuteRawSqlAsync<TResult>(string sql) where TResult : class, new()
     {
-        using (var command = ctx.Database.GetDbConnection().CreateCommand())
+        using var command = ctx.Database.GetDbConnection().CreateCommand();
+        command.CommandText = sql;
+        command.CommandType = CommandType.Text;
+
+        ctx.Database.OpenConnection();
+
+        using var result = await command.ExecuteReaderAsync();
+        var entities = new List<TResult>();
+
+        while (await result.ReadAsync())
         {
-            command.CommandText = sql;
-            command.CommandType = CommandType.Text;
-
-            ctx.Database.OpenConnection();
-
-            using (var result = await command.ExecuteReaderAsync())
+            var entity = new TResult();
+            for (var i = 0; i < result.FieldCount; i++)
             {
-                var entities = new List<TResult>();
-
-                while (await result.ReadAsync())
+                var property = entity.GetType().GetProperty(result.GetName(i));
+                if (property != null && !DBNull.Value.Equals(result.GetValue(i)))
                 {
-                    var entity = new TResult();
-                    for (var i = 0; i < result.FieldCount; i++)
-                    {
-                        var property = entity.GetType().GetProperty(result.GetName(i));
-                        if (property != null && !DBNull.Value.Equals(result.GetValue(i)))
-                        {
-                            property.SetValue(entity, result.GetValue(i));
-                        }
-                    }
-
-                    entities.Add(entity);
+                    property.SetValue(entity, result.GetValue(i));
                 }
-
-                return entities;
             }
+
+            entities.Add(entity);
         }
+
+        return entities;
+    }
+
+    public async Task<TResult?> ExecuteRawSqlSingleAsync<TResult>(string sql) where TResult : class, new()
+    {
+        using var command = ctx.Database.GetDbConnection().CreateCommand();
+        command.CommandText = sql;
+        command.CommandType = CommandType.Text;
+
+        ctx.Database.OpenConnection();
+
+        using var result = await command.ExecuteReaderAsync();
+        if (await result.ReadAsync())
+        {
+            var entity = new TResult();
+            for (var i = 0; i < result.FieldCount; i++)
+            {
+                var property = entity.GetType().GetProperty(result.GetName(i));
+                if (property != null && !DBNull.Value.Equals(result.GetValue(i)))
+                {
+                    property.SetValue(entity, result.GetValue(i));
+                }
+            }
+
+            return entity;
+        }
+
+        return null;
     }
 }

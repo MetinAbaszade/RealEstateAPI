@@ -153,4 +153,7 @@
   <data name="VerificationCodeSent" xml:space="preserve">
     <value>Verification Code Sent Successfully</value>
   </data>
+  <data name="FavouriteAlreadyExists" xml:space="preserve">
+    <value>Item has already been added into favourites</value>
+  </data>
 </root>

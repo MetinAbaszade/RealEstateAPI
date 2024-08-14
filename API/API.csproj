@@ -19,7 +19,6 @@
         <None Remove="wwwroot\users\**" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="7.1.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="7.1.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />

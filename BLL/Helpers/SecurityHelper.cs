@@ -1,7 +1,9 @@
-﻿using CORE.Config;
+﻿using CORE.Abstract;
+using CORE.Config;
 using DTO.User;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -9,7 +11,7 @@ using System.Text;
 
 namespace BLL.Helpers;
 
-public class SecurityHelper(ConfigSettings configSettings)
+public class SecurityHelper(ConfigSettings configSettings, IUtilService utilService)
 {
     public static string GenerateSalt()
     {
@@ -40,10 +42,10 @@ public class SecurityHelper(ConfigSettings configSettings)
     public string CreateTokenForUser(UserResponseDto userDto, DateTime expirationDate)
     {
         var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, userDto.Id.ToString()), // Standard subject claim
-        new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(expirationDate).ToUnixTimeSeconds().ToString()) // Expiration in Unix time
-    };
+        {
+            new(configSettings.AuthSettings.TokenUserIdKey, utilService.Encrypt(userDto.Id.ToString())),
+            new(ClaimTypes.Expiration, expirationDate.ToString(CultureInfo.InvariantCulture))
+        };
 
         var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configSettings.AuthSettings.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

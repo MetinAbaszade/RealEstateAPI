@@ -57,7 +57,7 @@ public class TokenService(ConfigSettings configSettings,
 
     public async Task<IDataResult<LoginResponseDto>> CreateTokenAsync(UserResponseDto dto)
     {
-        var securityHelper = new SecurityHelper(configSettings);
+        var securityHelper = new SecurityHelper(configSettings, utilService);
         var accessTokenExpireDate = DateTime.UtcNow.AddHours(configSettings.AuthSettings.TokenExpirationTimeInHours);
 
         var loginResponseDto = new LoginResponseDto()

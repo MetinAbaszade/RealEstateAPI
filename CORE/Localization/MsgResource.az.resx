@@ -156,4 +156,7 @@
   <data name="VerificationCodeSent" xml:space="preserve">
     <value>Təsdiq kodu uğurla göndərildi</value>
   </data>
+  <data name="FavouriteAlreadyExists" xml:space="preserve">
+    <value>Artıq seçilmişlərə əlavə olunub</value>
+  </data>
 </root>

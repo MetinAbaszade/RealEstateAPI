@@ -52,7 +52,9 @@ public class UserService(IMapper mapper,
     {
         var user = await userRepository.GetAsync(id);
         if (user == null)
+        {
             return new ErrorDataResult<UserByIdResponseDto>(EMessages.UserIsExist.Translate());
+        }
         var data = mapper.Map<UserByIdResponseDto>(await userRepository.GetAsync(id));
         return new SuccessDataResult<UserByIdResponseDto>(data, EMessages.Success.Translate());
     }
@@ -60,9 +62,9 @@ public class UserService(IMapper mapper,
     public async Task<IDataResult<User>?> GetAsync(Expression<Func<User, bool>> filter)
     {
         var user = await userRepository.SingleOrDefaultAsync(filter);
-        if (user is null)
-            return new ErrorDataResult<User>(EMessages.UserIsExist.Translate());
-        return new SuccessDataResult<User>(user, EMessages.Success.Translate());
+        return user is null
+            ? new ErrorDataResult<User>(EMessages.UserIsExist.Translate())
+            : new SuccessDataResult<User>(user, EMessages.Success.Translate());
     }
 
     public async Task<IResult> UpdateAsync(Guid id, UserUpdateRequestDto dto)

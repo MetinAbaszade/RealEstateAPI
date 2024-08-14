@@ -71,4 +71,7 @@ public class Property
     public int? FkIdRepair { get; set; }
 
     public int? FkIdTarget { get; set; }
+
+    public virtual ICollection<Favourite> Favourites { get; set; } = [];
 }
+

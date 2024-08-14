@@ -24,4 +24,5 @@ public interface IGenericRepository<T> where T : class
     Task<List<T>> AddRangeAsync(List<T> entity);
     Task<List<T>> UpdateRangeAsync(List<T> entity);
     Task<List<TResult>> ExecuteRawSqlAsync<TResult>(string sql) where TResult : class, new();
+    Task<TResult?> ExecuteRawSqlSingleAsync<TResult>(string sql) where TResult : class, new();
 }

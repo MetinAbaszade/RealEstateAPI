@@ -16,5 +16,6 @@ public enum EMessages
     DataNotFound,
     FileIsLargeThan2Mb,
     FileIsNotFound,
-    ThisFileTypeIsNotAllowed
+    ThisFileTypeIsNotAllowed,
+    FavouriteAlreadyExists
 }
