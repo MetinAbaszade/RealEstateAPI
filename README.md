@@ -1,24 +1,35 @@
-# NetAPIStarter
+# RealEstate API
 
-### Code contributors
+This repository contains the backend of the **RealEstate API**, a comprehensive solution for a home-selling project. Developed with **ASP.NET Core Web API**, it adheres to modern software design principles, including **N-Tier Architecture** and **Entity Framework Core** (Code-First). Below are the key features and technologies implemented.
 
-![Alt](https://repobeats.axiom.co/api/embed/f8c50b5c55ce520d8198a81cb6f63150cec32209.svg "Repobeats analytics image")
+## Technologies & Tools
+- **.NET 8**: Latest framework version for high performance and scalability.
+- **ASP.NET Core Web API**: RESTful API framework.
+- **Entity Framework Core**: Code-first approach for database modeling.
+- **Docker**: Used for containerization and deployment through `docker-compose.yml`.
+- **MiniProfiler**: Added for request profiling.
+- **Sentry**: Handles unhandled exceptions.
+- **Action Filters**: For logging and custom request/response processing.
 
-> .NET Web API project with Entity framework code first approach. In this template n-tier architecture, repository and unit of work pattern implemented,
-> database based logging implemented using action filters, request profiling added using MiniProfiler, unhandled exception handled by sentry,
-> source code generator implemented, this mean is that all crud operaions (paginatedlist, get, getbyid, add, update, delete, softdelete) generated automatically in a 2 seconds after creating entity,
-> watcdog implemented,
-> token black list implemented, custom validate token attribute added,
-> response security headers added, audit properties implemented by overriding SaveChangesAsync method of DbContext, docker-compose yaml written,
-> authentication and authorization implemented using custom middleware, generic CRUD operations implemented, automapper configured,
-> simple one to many role and permission logic implemented,
-> password policy implemented,
-> anti forgery token implemented,
-> generic pagination, global exception handling, localization, whitelist, custom generic automapping & validations between entity and dtos implemented,
-> mail sender implemented,
-> encoding and decoding implemened,
-> sftp functions implemented,
-> source code generator for DAL, BLL, API layer implemented,
-> Database and application dockerized. Docker compose implemented with build step,
-> automated service registration implemented using Scrutor,
-> .editorconfig implemented to the best conventions rules
+## Features
+- **Authentication & Authorization**: Implemented with custom middleware and token blacklisting.
+- **Custom Validation**: Token validation and other request-level checks.
+- **Database Logging**: Comprehensive logging through database action filters.
+- **Global Exception Handling**: Robust error management.
+- **Security Headers**: Ensured response security with headers.
+- **Audit Properties**: Tracked changes by overriding `SaveChangesAsync`.
+- **Automapper Configuration**: For DTO to entity mapping.
+- **Generic CRUD Operations**: Implemented for multiple entities.
+- **Pagination**: Custom generic pagination functionality.
+- **Localization**: Multi-language support.
+- **Mail Sender**: Integrated mail-sending service.
+- **Custom Automapping & Validation**: Between entities and DTOs.
+- **Encoding/Decoding**: Added for secure data handling.
+
+## Architecture Layers
+- **API Layer**: Handles HTTP requests and routing.
+- **BLL (Business Logic Layer)**: Contains business rules and logic.
+- **Core Layer**: Provides essential utilities and cross-cutting concerns.
+- **DAL (Data Access Layer)**: Manages database access using EF Core.
+- **DTO (Data Transfer Objects Layer)**: Facilitates data exchange between layers.
+- **Entities Layer**: Represents the database models/entities.
